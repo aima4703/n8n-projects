@@ -1,0 +1,154 @@
+{
+  "name": "Lead Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "=lead-form",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        32
+      ],
+      "id": "74175205-4583-453c-86e1-603fb0a4012f",
+      "name": "Webhook",
+      "webhookId": "171814b1-2af7-4090-97fc-8e8ef2275158"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1NgTLUZPHm2J9HEq8PkUaeTGi6EBTH7cnbF3cjwxBI8A",
+          "mode": "list",
+          "cachedResultName": "Leads Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NgTLUZPHm2J9HEq8PkUaeTGi6EBTH7cnbF3cjwxBI8A/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NgTLUZPHm2J9HEq8PkUaeTGi6EBTH7cnbF3cjwxBI8A/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{$json[\"query\"][\"name\"]}}",
+            "Email": "={{$json[\"query\"][\"email\"]}}",
+            "Message": "={{$json[\"query\"][\"message\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -64,
+        32
+      ],
+      "id": "dcb60b76-a911-4a29-9cd5-72cc8893adfe",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6V6XweAfeMF98L2I",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "aima.asim4703@gmail.com",
+        "subject": "Thank you for contacting us",
+        "message": "=Hi Aima Asim,  Thanks for your message: \"Hello\"  We will contact you soon.  Regards, Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        32
+      ],
+      "id": "1f5388eb-d62f-4556-bf9e-40f660d1c186",
+      "name": "Send a message",
+      "webhookId": "b1115bec-2b98-4710-b74c-34f8ffad3ab7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WfLKJ4U70mte7idy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "34b493d3-5230-4336-8c1a-9dcd1f624067",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "39503a3b6f4017f1e39c4d1066ea46d1db9b00bb6e95fb078eb8cfb24a096588"
+  },
+  "id": "S6wvfPNPYkJmlRUL",
+  "tags": []
+}

@@ -1,10 +1,10 @@
-API Integration Workflow
+Automated Lead Capture \& Email Response System
 
 
 
 What the workflow does?
 
-Fetches data from an external API, processes the JSON response, stores structured data in Google Sheets, and builds a reusable automation pipeline for future integrations.
+Captures leads submitted via a web form (webhook), stores the data in Google Sheets, and automatically sends a follow-up email to the user.  
 
 
 
@@ -12,13 +12,11 @@ Tools Used
 
 \- n8n (Workflow Automation)
 
-\- HTTP Request Node (for API calls)
+\- Webhook Node (to receive form submissions)
 
 \- Google Sheets
 
-\- Function Node (to process and transform JSON data)
-
-
+\- Gmail Node (for sending automated emails)
 
 
 
