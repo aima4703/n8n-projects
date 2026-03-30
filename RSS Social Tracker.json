@@ -1,0 +1,294 @@
+{
+  "name": "RSS Social Tracker",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4cd2602c-1cf8-4fc7-a400-6bb9d86546a6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=technology",
+        "options": {
+          "customFields": "5"
+        }
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3ccdc967-f0e2-4ab9-bf4d-e61713c3c1f7",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HjmRlTdU8FTgWtcCjHdm9gltwHLiC3k5-y5jcZewxX0",
+          "mode": "list",
+          "cachedResultName": "Social Media Mentions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HjmRlTdU8FTgWtcCjHdm9gltwHLiC3k5-y5jcZewxX0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HjmRlTdU8FTgWtcCjHdm9gltwHLiC3k5-y5jcZewxX0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date ": "={{ $json.date }}",
+            "Platform": "={{ $json.platform }}",
+            "Author": "={{ $json.author }}",
+            "Post": "={{ $json.post }}",
+            "URL": "={{ $json.url }}",
+            "Sentiment": "={{ $json.sentiment }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date ",
+              "displayName": "Date ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Platform",
+              "displayName": "Platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Author",
+              "displayName": "Author",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Post",
+              "displayName": "Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sentiment",
+              "displayName": "Sentiment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        832,
+        0
+      ],
+      "id": "1d30a96b-045c-49cd-b6fd-fd0b598735af",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6V6XweAfeMF98L2I",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const positiveWords = [\"love\",\"great\",\"happy\",\"awesome\",\"success\",\"good\"];\nconst negativeWords = [\"bad\",\"hate\",\"fail\",\"angry\",\"problem\",\"terrible\"];\n\nreturn items.map(item => {\n  const text = item.json.post.toLowerCase();\n  let sentiment = \"Neutral\";\n  if (positiveWords.some(w => text.includes(w))) sentiment = \"Positive\";\n  if (negativeWords.some(w => text.includes(w))) sentiment = \"Negative\";\n  item.json.sentiment = sentiment;\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "5e10eaed-d5ea-4f91-96c1-46533fae6b39",
+      "name": "Sentiment Node"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b2efff8a-980a-43b2-b75d-d64843bfba68",
+              "leftValue": "{{$json.sentiment}}",
+              "rightValue": "Negative",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        848,
+        -192
+      ],
+      "id": "67d14c1d-7c81-439c-b0b4-e39565aadceb",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    json: {\n      date: item.json.pubDate,\n      platform: \"RSS\",\n      author: item.json.creator || \"Unknown\",\n      post: item.json.title + \" \" + (item.json.content || \"\"),\n      url: item.json.link\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b3bfd82e-1afa-4219-b762-2a260cb928e0",
+      "name": "Function - Post Data"
+    },
+    {
+      "parameters": {
+        "sendTo": "aima.asim4703@gmail.com",
+        "subject": "⚠️ Negative News Alert",
+        "message": "=Negative Mention Found:  {{$json.post}}  Link: {{$json.url}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1088,
+        -320
+      ],
+      "id": "da2af053-9586-4349-8635-a8e13b16e2ae",
+      "name": "Send a message",
+      "webhookId": "d3c6d1c7-b0dc-4602-88f3-bd59ef1db2a9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WfLKJ4U70mte7idy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Function - Post Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Node": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - Post Data": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9c6391ec-a956-4ab9-9fb2-91ca3f161d9c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "39503a3b6f4017f1e39c4d1066ea46d1db9b00bb6e95fb078eb8cfb24a096588"
+  },
+  "id": "e8dhkPfagnljeMbk",
+  "tags": []
+}
