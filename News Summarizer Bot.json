@@ -1,0 +1,366 @@
+{
+  "name": "News Summarizer Bot",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        -704
+      ],
+      "id": "3e520fb1-f6c8-4071-9a39-8607b5436108",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://news.google.com/rss/search?q=AI",
+        "options": {
+          "customFields": "5"
+        }
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        -704
+      ],
+      "id": "94a6bb96-e0e6-4d56-9b57-4c6d44dcfb1d",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "11211c01-ff00-48c8-9e08-06261e60573f",
+              "leftValue": "={{$json.title}}",
+              "rightValue": "AI",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        -704
+      ],
+      "id": "be4bbb1d-7c25-4d16-9f3d-8b2468c7e14b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    json: {\n      date: item.json.pubDate,\n      title: item.json.title,\n      content: item.json.contentSnippet || \"\",\n      url: item.json.link\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        -704
+      ],
+      "id": "679a8e78-4a46-43cf-9d95-f69a8ded9be2",
+      "name": "Function - Extract Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  let text = item.json.content;\n\n  let summary = text.split(\" \").slice(0, 20).join(\" \") + \"...\";\n\n  item.json.summary = summary;\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -704
+      ],
+      "id": "78403fa1-6855-4c5e-8f6c-a33cb389ccdd",
+      "name": "Summary"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "19e_HRvIHJ3VKeKAaxj4rmctEWKwM_miwqF4oQXRkWWE",
+          "mode": "list",
+          "cachedResultName": "News Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19e_HRvIHJ3VKeKAaxj4rmctEWKwM_miwqF4oQXRkWWE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19e_HRvIHJ3VKeKAaxj4rmctEWKwM_miwqF4oQXRkWWE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date ": "={{$json.date}}",
+            "Title": "={{$json.title}}",
+            "Summary": "={{$json.summary}}",
+            "URL": "={{$json.url}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date ",
+              "displayName": "Date ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL",
+              "displayName": "URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        -704
+      ],
+      "id": "dc0d2a19-c671-4d84-a3db-ea92bdbd05e3",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6V6XweAfeMF98L2I",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -944,
+        -480
+      ],
+      "id": "c0db44a0-f83e-47fa-bcef-de13ac6f8513",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "19e_HRvIHJ3VKeKAaxj4rmctEWKwM_miwqF4oQXRkWWE",
+          "mode": "list",
+          "cachedResultName": "News Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19e_HRvIHJ3VKeKAaxj4rmctEWKwM_miwqF4oQXRkWWE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/19e_HRvIHJ3VKeKAaxj4rmctEWKwM_miwqF4oQXRkWWE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -720,
+        -480
+      ],
+      "id": "3536e165-7c59-45b3-b60b-4a47fa1d1204",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6V6XweAfeMF98L2I",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let report = \"📰 Daily News Report:\\n\\n\";\n\nitems.slice(0,5).forEach((item, index) => {\n  report += `${index+1}. ${item.json.Title}\\n`;\n  report += `${item.json.Summary}\\n`;\n  report += `${item.json.URL}\\n\\n`;\n});\n\nreturn [{ json: { report } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -496,
+        -480
+      ],
+      "id": "fc71f46f-3781-488c-a670-05c4f48c71a8",
+      "name": "Function - Create Report"
+    },
+    {
+      "parameters": {
+        "sendTo": "aima.asim4703@gmail.com",
+        "subject": "Daily News Report",
+        "message": "={{$json.report}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -240,
+        -480
+      ],
+      "id": "51fb0134-e875-4030-8662-975787bfff12",
+      "name": "Send a message",
+      "webhookId": "62c23f9b-6540-4643-bf98-131a5303c967",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "WfLKJ4U70mte7idy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Function - Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - Extract Data": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summary": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Function - Create Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function - Create Report": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9fbcb941-33eb-4be3-b627-8a40590533ef",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "39503a3b6f4017f1e39c4d1066ea46d1db9b00bb6e95fb078eb8cfb24a096588"
+  },
+  "id": "Fw2tL3vLatExdoax",
+  "tags": []
+}

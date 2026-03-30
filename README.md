@@ -1,10 +1,10 @@
-Automated Lead Capture \& Email Response System
+Automated News Aggregator with AI Summarization \& Daily Reporting
 
 
 
 What the workflow does?
 
-Captures leads submitted via a web form (webhook), stores the data in Google Sheets, and automatically sends a follow-up email to the user.  
+Collects news articles via RSS feeds, filters important news based on keywords, summarizes content, saves data in Google Sheets, and sends a daily report via email with top news highlights.
 
 
 
@@ -12,11 +12,15 @@ Tools Used
 
 \- n8n (Workflow Automation)
 
-\- Webhook Node (to receive form submissions)
+\- RSS Feeds (News sources)
 
 \- Google Sheets
 
-\- Gmail Node (for sending automated emails)
+\- Email Node
+
+\- JavaScript (for AI-like summarization logic)
+
+
 
 
 
