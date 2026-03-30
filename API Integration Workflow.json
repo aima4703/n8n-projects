@@ -1,0 +1,203 @@
+{
+  "name": "API Integration Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -32
+      ],
+      "id": "323abb20-7120-4ef3-a90e-41677ebe9c54",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -272,
+        -32
+      ],
+      "id": "cacec3cf-f55e-484a-a8fb-ef805c4f709d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "22449745-ff6f-45bc-87d7-b106d2a077e9",
+              "name": "name",
+              "value": "={{$json[\"name\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "50889c32-f487-435f-9b7a-b300b21ed9e3",
+              "name": "symbol",
+              "value": "={{$json[\"symbol\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "8cd74c6f-5c3a-4801-91d5-5a5c6771c7b4",
+              "name": "current_price",
+              "value": "={{$json[\"current_price\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "dbc50c64-091f-4c40-b9c3-b3180228393e",
+              "name": "market_cap",
+              "value": "={{$json[\"market_cap\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        -32
+      ],
+      "id": "4654f2b2-8efc-4e76-8acb-ee6b8e166554",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qfPQVUtXfeafkMNbER26FbkFw0xBH2dk0VRn9VMZBB0",
+          "mode": "list",
+          "cachedResultName": "API_Data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qfPQVUtXfeafkMNbER26FbkFw0xBH2dk0VRn9VMZBB0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qfPQVUtXfeafkMNbER26FbkFw0xBH2dk0VRn9VMZBB0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{$json[\"name\"]}}",
+            "Symbol": "={{$json[\"symbol\"]}}",
+            "Current Price": "={{$json[\"current_price\"]}}",
+            "Market Cap": "={{$json[\"market_cap\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Symbol",
+              "displayName": "Symbol",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Current Price",
+              "displayName": "Current Price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Market Cap",
+              "displayName": "Market Cap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        160,
+        -32
+      ],
+      "id": "eca3cc58-e87b-48e3-9bef-1ca7ce90e202",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6V6XweAfeMF98L2I",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c32944f1-ecae-4fac-9fcc-5e945a3f0e62",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "39503a3b6f4017f1e39c4d1066ea46d1db9b00bb6e95fb078eb8cfb24a096588"
+  },
+  "id": "QixWkFFaRZ8nUc3z",
+  "tags": []
+}
